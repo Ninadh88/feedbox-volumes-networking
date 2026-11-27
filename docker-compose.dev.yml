@@ -1,0 +1,13 @@
+
+services:
+  api:
+    # Restart the API automatically when server.js changes
+    command: ["npx", "nodemon", "--legacy-watch", "--watch", "server.js", "server.js"]
+
+    volumes:
+      # Make host project files visible inside the API container
+      - .:/app
+
+      # Protect the container's Linux-installed node_modules
+      # from being replaced by the host's node_modules
+      - /app/node_modules
