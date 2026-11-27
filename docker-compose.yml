@@ -1,8 +1,15 @@
+
 services:
   db:
     image: postgres:15
     env_file:
       - .env
+    volumes:
+      # Persist PostgreSQL data even when containers are removed
+      - db_data:/var/lib/postgresql/data
+    networks:
+      # Database is accessible only to backend-connected services
+      - backend
 
   api:
     build: .
@@ -12,6 +19,10 @@ services:
       - .env
     depends_on:
       - db
+    networks:
+      # API connects to the browser-facing and database networks
+      - frontend
+      - backend
 
   web:
     build: ./client
@@ -19,3 +30,15 @@ services:
       - "3000:80"
     depends_on:
       - api
+    networks:
+      # Web is not directly connected to the database network
+      - frontend
+
+# Persistent Docker-managed storage for PostgreSQL
+volumes:
+  db_data:
+
+# Separate networks for application traffic and database traffic
+networks:
+  frontend:
+  backend:
